@@ -1,0 +1,30 @@
+// go get -u google.golang.org/grpc
+// go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+// go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+// protoc --go_out=. --go-grpc_out=. proto/anomaly_identifier.proto
+// go mod vendor
+syntax = "proto3";
+
+package anomaly_identifier;
+
+option go_package = "./anomaly_identifier";
+
+enum Services {
+  PGSQL = 0;
+}
+
+message AnomalyIdentifierRequest {
+  Services service = 1;
+  string field = 2;
+  string restrictiveQuery = 3;
+  string table = 4;
+}
+
+message AnomalyIdentifierResponse {
+  repeated int32 anomaly_ids = 1 [packed=true];
+}
+
+service AnomalyIdentifierService {
+  rpc Generate(AnomalyIdentifierRequest) returns (AnomalyIdentifierResponse) {}
+}
+
