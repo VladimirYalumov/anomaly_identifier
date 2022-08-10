@@ -1,16 +1,15 @@
 package pgsqlclient
 
 import (
+	ai "anomaly_identifier/proto/anomaly_identifier"
 	"context"
 	"google.golang.org/grpc"
-	ai "grpc_anomaly_identifier/proto/anomaly_identifier"
 )
 
 func getAnomalyIds(field string, restrictiveQuery string) ([]int32, error) {
 	conn, _ := grpc.Dial("127.0.0.1:8088", grpc.WithInsecure())
 
 	client := ai.NewAnomalyIdentifierServiceClient(conn)
-
 	resp, err := client.Generate(
 		context.Background(),
 		&ai.AnomalyIdentifierRequest{

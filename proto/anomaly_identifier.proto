@@ -9,19 +9,33 @@ package anomaly_identifier;
 
 option go_package = "./anomaly_identifier";
 
-enum Services {
+enum Service {
   PGSQL = 0;
 }
 
+enum ComparisonSign {
+  MORE = 0;
+  LESS = 1;
+  EQUALS = 2;
+  MORE_EQUALS = 3;
+  LESS_EQUALS = 4;
+}
+
+message Limitation {
+  string field = 1;
+  ComparisonSign comparisonSign = 2;
+  string value = 3;
+}
+
 message AnomalyIdentifierRequest {
-  Services service = 1;
+  Service service = 1;
   string field = 2;
-  string restrictiveQuery = 3;
+  repeated Limitation limitation = 3;
   string table = 4;
 }
 
 message AnomalyIdentifierResponse {
-  repeated int32 anomaly_ids = 1 [packed=true];
+  repeated int64 anomaly_ids = 1 [packed=true];
 }
 
 service AnomalyIdentifierService {

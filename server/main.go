@@ -1,24 +1,42 @@
 package main
 
 import (
+	ai "anomaly_identifier/proto/anomaly_identifier"
+	"anomaly_identifier/server/services"
 	"context"
 	"google.golang.org/grpc"
-	ai "grpc_anomaly_identifier/proto/anomaly_identifier"
 	"log"
 	"net"
 )
 
-type PasswordGeneratorServiceServer struct {
+type AnomalyIdentifierServiceServer struct {
 	ai.AnomalyIdentifierServiceServer
 }
 
-func (s *PasswordGeneratorServiceServer) Generate(ctx context.Context,
+func (s *AnomalyIdentifierServiceServer) Generate(ctx context.Context,
 	req *ai.AnomalyIdentifierRequest) (*ai.AnomalyIdentifierResponse, error) {
 
-	var err error
 	response := new(ai.AnomalyIdentifierResponse)
+	service, err := services.GetService(req)
 
-	response.AnomalyIds = make([]int32, 10)
+	if err != nil {
+		return response, err
+	}
+
+	err = service.InitDB(
+		services.ConnectionSettings[0],
+		services.ConnectionSettings[1],
+		services.ConnectionSettings[2],
+		services.ConnectionSettings[3],
+		services.ConnectionSettings[4],
+	)
+
+	if err != nil {
+		return response, err
+	}
+
+	restrictiveQuery := service.MakeRestrictiveQuery(req.GetLimitation())
+	response.AnomalyIds, err = service.GetResult(req.Field, restrictiveQuery)
 
 	return response, err
 }
@@ -26,7 +44,7 @@ func (s *PasswordGeneratorServiceServer) Generate(ctx context.Context,
 func main() {
 	server := grpc.NewServer()
 
-	instance := new(PasswordGeneratorServiceServer)
+	instance := new(AnomalyIdentifierServiceServer)
 
 	ai.RegisterAnomalyIdentifierServiceServer(server, instance)
 
