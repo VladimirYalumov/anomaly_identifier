@@ -1,7 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"anomaly_identifier/client"
+)
 
 func main() {
-	fmt.Println("Hello world!")
+	_ = client.AddLimitation("created_at", 0, "15.08.2022")
+	_, _ = client.GetPGSqlAnomalyIds("price")
 }

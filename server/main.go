@@ -17,19 +17,12 @@ func (s *AnomalyIdentifierServiceServer) Generate(ctx context.Context,
 	req *ai.AnomalyIdentifierRequest) (*ai.AnomalyIdentifierResponse, error) {
 
 	response := new(ai.AnomalyIdentifierResponse)
+
 	service, err := services.GetService(req)
 
 	if err != nil {
 		return response, err
 	}
-
-	err = service.InitDB(
-		services.ConnectionSettings[0],
-		services.ConnectionSettings[1],
-		services.ConnectionSettings[2],
-		services.ConnectionSettings[3],
-		services.ConnectionSettings[4],
-	)
 
 	if err != nil {
 		return response, err
